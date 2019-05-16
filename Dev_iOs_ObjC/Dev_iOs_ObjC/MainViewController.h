@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  MainViewController.h
 //  Dev_iOs_ObjC
 //
 //  Created by Tatiana Tsygankova on 05.05.2019.
@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OrdersListViewController.h"
 
-@interface ViewController : UIViewController
+@interface MainViewController : UIViewController
 
 
 @end
