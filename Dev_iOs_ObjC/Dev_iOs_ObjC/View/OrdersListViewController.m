@@ -7,16 +7,14 @@
 //
 
 #import "OrdersListViewController.h"
-#import "NetworkService.h"
+#import "OrdersListCell.h"
+#import "Order.h"
 
 @interface OrdersListViewController() <UITableViewDataSource, UITableViewDelegate, OrderCellDelegate>
 
 @property (strong, nonatomic) UITableView *tableView;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (strong, nonatomic) UISegmentedControl *segmentedControl;
-
-@property (strong, nonatomic) NSMutableArray *orders;
-@property (strong, nonatomic) NSMutableArray *deliveries;
 
 @property (strong, nonatomic) NSMutableArray *items;
 
@@ -34,62 +32,12 @@
     [self.tableView setDelegate:self];
     [self.view addSubview:self.tableView];
     
-    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    self.activityIndicator.color = [UIColor blackColor];
-    self.activityIndicator.frame = self.view.bounds;
-    self.activityIndicator.hidesWhenStopped = YES;
-    [self.view addSubview:self.activityIndicator];
-    
     self.segmentedControl = [[UISegmentedControl alloc]initWithItems:@[@"Новые Заказы", @"Доставлено"]];
     [self.segmentedControl addTarget:self action:@selector(changeSource) forControlEvents:UIControlEventValueChanged];
     [self.segmentedControl setTintColor:[UIColor blackColor]];
     self.navigationItem.titleView = self.segmentedControl;
     self.segmentedControl.selectedSegmentIndex = 0;
     [self changeSource];
-    
-    [self.activityIndicator startAnimating];
-    
-//    [self prepareOrders];
-//    [self.activityIndicator stopAnimating];
-//    [self changeSource];
-    
-    [[NetworkService sharedInstance] getOrders: @"" withCompletion:^(NSArray * _Nonnull orders) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.activityIndicator stopAnimating];
-            if(orders.count <= 0) {
-                [self prepareOrders];
-            } else {
-                self.orders = [orders copy];
-            }
-
-            [self changeSource];
-        });
-    }];
-}
-
-- (void) prepareOrders {
-    self.orders = [[NSMutableArray alloc] initWithObjects:
-                   [[Order alloc] initWithDictionary: @{  @"number": @"555",
-                                                          @"name": @"Ольга",
-                                                          @"surname": @"Иванова",
-                                                          @"building": @"54",
-                                                          @"street": @"ул Новая",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"777-77-77",
-                                                          @"total": @"3200"}],
-                   [[Order alloc] initWithDictionary: @{  @"number": @"777",
-                                                          @"name": @"Петр",
-                                                          @"surname": @"Петров",
-                                                          @"building": @"5",
-                                                          @"street": @"ул Летняя",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"888-88-88",
-                                                          @"total": @"7567"}],
-                  nil];
 }
 
 - (void) changeSource {

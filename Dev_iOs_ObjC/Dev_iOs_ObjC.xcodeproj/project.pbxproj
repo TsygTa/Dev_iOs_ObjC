@@ -13,6 +13,8 @@
 		3FC59DCB228C1AA2003343D4 /* OrdersListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DCA228C1AA2003343D4 /* OrdersListViewController.m */; };
 		3FC59DCE228C3FEF003343D4 /* OrdersListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DCD228C3FEF003343D4 /* OrdersListCell.m */; };
 		3FC59DD1228C5B89003343D4 /* AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DD0228C5B89003343D4 /* AlertView.m */; };
+		3FCC94D9228F5B3200D1E1E4 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FCC94D8228F5B3200D1E1E4 /* MapViewController.m */; };
+		3FCC94E5229280B900D1E1E4 /* LocationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FCC94E4229280B900D1E1E4 /* LocationService.m */; };
 		3FEA1BD9227F1EDC00133133 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FEA1BD8227F1EDC00133133 /* AppDelegate.m */; };
 		3FEA1BDC227F1EDC00133133 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FEA1BDB227F1EDC00133133 /* MainViewController.m */; };
 		3FEA1BE1227F1EDE00133133 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FEA1BE0227F1EDE00133133 /* Assets.xcassets */; };
@@ -52,6 +54,10 @@
 		3FC59DCD228C3FEF003343D4 /* OrdersListCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OrdersListCell.m; sourceTree = "<group>"; };
 		3FC59DCF228C5B89003343D4 /* AlertView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		3FC59DD0228C5B89003343D4 /* AlertView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlertView.m; sourceTree = "<group>"; };
+		3FCC94D7228F5B3200D1E1E4 /* MapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
+		3FCC94D8228F5B3200D1E1E4 /* MapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
+		3FCC94E3229280B900D1E1E4 /* LocationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocationService.h; sourceTree = "<group>"; };
+		3FCC94E4229280B900D1E1E4 /* LocationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocationService.m; sourceTree = "<group>"; };
 		3FEA1BD4227F1EDC00133133 /* Dev_iOs_ObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dev_iOs_ObjC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FEA1BD7227F1EDC00133133 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3FEA1BD8227F1EDC00133133 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -94,7 +100,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3FC59DC7228C0568003343D4 /* Models */ = {
+		3FC59DC7228C0568003343D4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				3FC59DC4228C0549003343D4 /* Delivery.h */,
@@ -102,7 +108,7 @@
 				3FC59DC1228BFC4D003343D4 /* Order.h */,
 				3FC59DC2228BFC4D003343D4 /* Order.m */,
 			);
-			path = Models;
+			path = Model;
 			sourceTree = "<group>";
 		};
 		3FC59DD2228C5B9A003343D4 /* Helpers */ = {
@@ -119,8 +125,25 @@
 			children = (
 				3FC59DBF228B8F20003343D4 /* NetworkService.m */,
 				3FC59DBE228B8F20003343D4 /* NetworkService.h */,
+				3FCC94E3229280B900D1E1E4 /* LocationService.h */,
+				3FCC94E4229280B900D1E1E4 /* LocationService.m */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		3FCC94D6228F5A0500D1E1E4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				3FEA1BDA227F1EDC00133133 /* MainViewController.h */,
+				3FEA1BDB227F1EDC00133133 /* MainViewController.m */,
+				3FC59DC9228C1AA2003343D4 /* OrdersListViewController.h */,
+				3FC59DCA228C1AA2003343D4 /* OrdersListViewController.m */,
+				3FC59DCC228C3FEF003343D4 /* OrdersListCell.h */,
+				3FC59DCD228C3FEF003343D4 /* OrdersListCell.m */,
+				3FCC94D7228F5B3200D1E1E4 /* MapViewController.h */,
+				3FCC94D8228F5B3200D1E1E4 /* MapViewController.m */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		3FEA1BCB227F1EDC00133133 = {
@@ -147,16 +170,11 @@
 			isa = PBXGroup;
 			children = (
 				3FC59DD2228C5B9A003343D4 /* Helpers */,
-				3FC59DC7228C0568003343D4 /* Models */,
+				3FC59DC7228C0568003343D4 /* Model */,
 				3FC59DD6228D530F003343D4 /* Services */,
-				3FEA1BD7227F1EDC00133133 /* AppDelegate.h */,
+				3FCC94D6228F5A0500D1E1E4 /* View */,
 				3FEA1BD8227F1EDC00133133 /* AppDelegate.m */,
-				3FEA1BDA227F1EDC00133133 /* MainViewController.h */,
-				3FEA1BDB227F1EDC00133133 /* MainViewController.m */,
-				3FC59DC9228C1AA2003343D4 /* OrdersListViewController.h */,
-				3FC59DCA228C1AA2003343D4 /* OrdersListViewController.m */,
-				3FC59DCC228C3FEF003343D4 /* OrdersListCell.h */,
-				3FC59DCD228C3FEF003343D4 /* OrdersListCell.m */,
+				3FEA1BD7227F1EDC00133133 /* AppDelegate.h */,
 				3FEA1BE0227F1EDE00133133 /* Assets.xcassets */,
 				3FEA1BE2227F1EDE00133133 /* LaunchScreen.storyboard */,
 				3FEA1BE5227F1EDE00133133 /* Info.plist */,
@@ -312,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FCC94E5229280B900D1E1E4 /* LocationService.m in Sources */,
 				3FC59DCB228C1AA2003343D4 /* OrdersListViewController.m in Sources */,
 				3FEA1BDC227F1EDC00133133 /* MainViewController.m in Sources */,
 				3FC59DC3228BFC4D003343D4 /* Order.m in Sources */,
@@ -319,6 +338,7 @@
 				3FC59DC6228C0549003343D4 /* Delivery.m in Sources */,
 				3FC59DC0228B8F20003343D4 /* NetworkService.m in Sources */,
 				3FC59DD1228C5B89003343D4 /* AlertView.m in Sources */,
+				3FCC94D9228F5B3200D1E1E4 /* MapViewController.m in Sources */,
 				3FC59DCE228C3FEF003343D4 /* OrdersListCell.m in Sources */,
 				3FEA1BD9227F1EDC00133133 /* AppDelegate.m in Sources */,
 			);
