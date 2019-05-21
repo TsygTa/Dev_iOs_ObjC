@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "OrdersListCell.h"
-#import "Order.h"
 
 @interface OrdersListViewController : UIViewController
+
+@property (strong, nonatomic) NSMutableArray *orders;
+@property (strong, nonatomic) NSMutableArray *deliveries;
 
 @end

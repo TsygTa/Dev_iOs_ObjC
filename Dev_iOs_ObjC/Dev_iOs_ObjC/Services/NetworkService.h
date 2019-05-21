@@ -12,8 +12,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NetworkService : NSObject
+
 + (instancetype)sharedInstance;
 - (void)getOrders:(NSString*)deviceId withCompletion:(void(^)(NSArray *orders))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END
