@@ -7,8 +7,7 @@
 //
 
 #import "MainViewController.h"
-#import "OrdersListViewController.h"
-#import "MapViewController.h"
+#import "TabBarController.h"
 #import "NetworkService.h"
 
 #define TEST_FLAG 1
@@ -18,10 +17,6 @@
 @property (nonatomic, strong) UIImageView* antennaImage;
 @property (nonatomic, strong) UIView *gpsMessageView;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
-
-@property (strong, nonatomic) NSMutableArray *orders;
-@property (strong, nonatomic) NSMutableArray *deliveries;
-
 @end
 
 @implementation MainViewController
@@ -67,6 +62,20 @@
     
     //[self.view addSubview:self.gpsMessageView];
     
+    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2 + 40, 150,30)];
+    [ordersListButton setTitle:@"Заказы" forState:UIControlStateNormal];
+    ordersListButton.backgroundColor = [UIColor whiteColor];
+    [ordersListButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    ordersListButton.layer.borderWidth = 1;
+    ordersListButton.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    [ordersListButton.layer setShadowColor:[[UIColor blackColor] CGColor]];
+    [ordersListButton.layer setShadowOffset:CGSizeMake(5,5)];
+    [ordersListButton.layer setShadowOpacity: 0.5];
+    [ordersListButton setShowsTouchWhenHighlighted:YES];
+    
+    [ordersListButton addTarget: self action:@selector(orderButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview: ordersListButton];
+    
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     self.activityIndicator.color = [UIColor blackColor];
     self.activityIndicator.frame = self.view.bounds;
@@ -74,14 +83,16 @@
     [self.view addSubview:self.activityIndicator];
     
     [self.activityIndicator startAnimating];
+    self.dataManager.orders = [[NSMutableArray alloc] init];
+    self.dataManager.deliveries = [[NSMutableArray alloc] init];
+    
 #if TEST_FLAG
     [self prepareOrders];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self.activityIndicator stopAnimating];
         [self prepareOrdersCoordinates];
-        MapViewController *mapViewController = [[MapViewController alloc]init];
-        mapViewController.orders = [self.orders copy];
-        [self.navigationController pushViewController:mapViewController animated:YES];
+        TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
+        [self.navigationController pushViewController:tabBarController animated:YES];
     });
 #else
     [[NetworkService sharedInstance] getOrders: @"" withCompletion:^(NSArray * _Nonnull orders) {
@@ -91,13 +102,12 @@
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 });
             } else {
-                self.orders = [orders copy];
+                self.dataManager.orders = [orders copy];
             }
             [self.activityIndicator stopAnimating];
             [self prepareOrdersCoordinates];
-            MapViewController *mapViewController = [[MapViewController alloc]init];
-            mapViewController.orders = [self.orders copy];
-            [self.navigationController pushViewController:mapViewController animated:YES];
+            TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
+            [self.navigationController pushViewController:tabBarController animated:YES];
         });
     }];
 #endif
@@ -114,7 +124,7 @@
 }
 
 - (void) prepareOrders {
-    self.orders = [[NSMutableArray alloc] initWithObjects:
+    self.dataManager.orders = [[NSMutableArray alloc] initWithObjects:
                    [[Order alloc] initWithDictionary: @{  @"number": @"555",
                                                           @"name": @"Ольга",
                                                           @"surname": @"Иванова",
@@ -169,11 +179,17 @@
 }
 
 - (void) prepareOrdersCoordinates {
-    ((Order *) self.orders[0]).coordinate = CLLocationCoordinate2DMake(55.761629, 37.548151);
-    ((Order *) self.orders[1]).coordinate = CLLocationCoordinate2DMake(55.642047, 37.472279);
-    ((Order *) self.orders[2]).coordinate = CLLocationCoordinate2DMake(55.666127, 37.573510);
-    ((Order *) self.orders[3]).coordinate = CLLocationCoordinate2DMake(55.676646, 37.529789);
-    ((Order *) self.orders[4]).coordinate = CLLocationCoordinate2DMake(55.649865, 37.664384);
+    
+    ((Order *) self.dataManager.orders[0]).coordinate = CLLocationCoordinate2DMake(55.761629, 37.548151);
+    ((Order *) self.dataManager.orders[1]).coordinate = CLLocationCoordinate2DMake(55.642047, 37.472279);
+    ((Order *) self.dataManager.orders[2]).coordinate = CLLocationCoordinate2DMake(55.666127, 37.573510);
+    ((Order *) self.dataManager.orders[3]).coordinate = CLLocationCoordinate2DMake(55.676646, 37.529789);
+    ((Order *) self.dataManager.orders[4]).coordinate = CLLocationCoordinate2DMake(55.649865, 37.664384);
+}
+
+-(void) orderButtonDidTap:(UIButton *)sender {
+    TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
+    [self.navigationController pushViewController:tabBarController animated:YES];
 }
                    
 @end

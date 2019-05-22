@@ -17,12 +17,7 @@
         self.deviceId = @"";
         self.orderNumber = order.number;
         self.orderTotal = order.total;
-        
-        NSNumber *lng = 0;
-        NSNumber *lat = 0;
-        if(![lng isEqual:[NSNull null]] && ![lat isEqual:[NSNull null]]) {
-            self.coordinate = CLLocationCoordinate2DMake([lat doubleValue], [lng doubleValue]);
-        }
+        self.coordinate = order.coordinate;
     }
     return self;
 }

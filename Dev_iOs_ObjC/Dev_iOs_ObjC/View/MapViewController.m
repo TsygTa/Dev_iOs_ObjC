@@ -7,15 +7,13 @@
 //
 
 #import "MapViewController.h"
-#import <MapKit/MapKit.h>
-#import "Order.h"
-#import "OrdersListViewController.h"
-#import "LocationService.h"
 
-@interface MapViewController () <MKMapViewDelegate>
+@interface MapViewController() <MKMapViewDelegate>
 
 @property(nonatomic, strong) MKMapView *mapView;
-@property (nonatomic, strong) LocationService *myLocation;
+@property (nonatomic, strong) LocationService *locationService;
+@property (nonatomic, strong) MKPointAnnotation *myLocationMarker;
+
 @property BOOL isMyLocationStart;
 
 @end
@@ -27,11 +25,11 @@
     
     self.mapView = [[MKMapView alloc]initWithFrame:self.view.bounds];
     [self.mapView setDelegate:self];
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(((Order *)self.orders[0]).coordinate, 10000, 10000);
-    [self.mapView setRegion:region animated:true];
     
     [self.view addSubview:self.mapView];
-    self.isMyLocationStart = NO;
+    self.isMyLocationStart = false;
+    
+    [self centerMapOnOrder];
     
     UIButton *zoomInButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - 60, [UIScreen mainScreen].bounds.size.height/2 - 85, 50, 50)];
     [zoomInButton setImage:[UIImage imageNamed:@"monitoring_zoom_in_button_icon.png"] forState:UIControlStateNormal];
@@ -53,28 +51,60 @@
     myLocationButton.layer.cornerRadius = 25;
     [myLocationButton addTarget: self action:@selector(myLocationDidTap:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview: myLocationButton];
-    
-    for(Order *order in self.orders) {
-        MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-        annotation.title = [[NSString alloc] initWithFormat:@"Заказ № %@",order.number];
-        annotation.subtitle = [[NSString alloc] initWithFormat:@"%@", order.address];
-        annotation.coordinate = order.coordinate;
-        
-        [self.mapView addAnnotation:annotation];
-    }
-  
-    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height - 50, 150,30)];
-    [ordersListButton setTitle:@"Заказы" forState:UIControlStateNormal];
-    ordersListButton.backgroundColor = [UIColor whiteColor];
-    [ordersListButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [ordersListButton addTarget: self action:@selector(orderButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
-    [self.mapView addSubview: ordersListButton];
-    
+    [self showOrdersOnMap];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCurrentLocation:) name:kLocationServiceDidUpdateCurrentLocation object:nil];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.mapView removeAnnotations:[self.mapView annotations]];
+    [self showOrdersOnMap];
 }
 
 - (void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void) centerMapOnOrder {
+    MKCoordinateRegion region;
+    if(self.dataManager.orders.count > 0) {
+        region = MKCoordinateRegionMakeWithDistance(((Order *)self.dataManager.orders[0]).coordinate, 20000, 20000);
+    } else {
+        region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(55.751999, 37.617734), 20000, 20000);
+    }
+    [self.mapView setRegion:region animated:true];
+}
+
+- (void) showOrdersOnMap {
+    for(Order *order in self.dataManager.orders) {
+        MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+        annotation.title = [[NSString alloc] initWithFormat:@"Заказ № %@",order.number];
+        annotation.subtitle = [[NSString alloc] initWithFormat:@"%@\nСумма: %@\nТел: %@\nИмя: %@", order.address, order.total, order.phone, order.name];
+        annotation.coordinate = order.coordinate;
+        
+        [self.mapView addAnnotation:annotation];
+    }
+    for(Delivery *delivery in self.dataManager.deliveries) {
+        MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
+        annotation.title = [[NSString alloc] initWithFormat:@"Доставлено № %@",delivery.orderNumber];
+        annotation.subtitle = [[NSString alloc] initWithFormat:@"Заказ №%@\nСумма: %@\nДоставлено: %@", delivery.orderNumber, delivery.orderTotal, [dateFormatter stringFromDate:delivery.date]];
+        annotation.coordinate = delivery.coordinate;
+        
+        [self.mapView addAnnotation:annotation];
+    }
+}
+
+- (void) showMyLocation {
+    if(self.location) {
+        MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(self.location.coordinate, 20000, 20000);
+        [self.mapView setRegion:region animated:true];
+        self.myLocationMarker = [[MKPointAnnotation alloc] init];
+        self.myLocationMarker.title = @"Я";
+        self.myLocationMarker.coordinate = self.location.coordinate;
+        [self.mapView addAnnotation:self.myLocationMarker];
+    }
 }
 
 -(void) mapZoomInDidTap:(UIButton *)sender {
@@ -99,53 +129,65 @@
 
 -(void) myLocationDidTap:(UIButton *)sender {
     if(self.isMyLocationStart) {
-        [self.myLocation stop];
-    } else {
-        if(!self.myLocation) {
-            self.myLocation = [[LocationService alloc] init];
+        [self.locationService stop];
+        self.isMyLocationStart = false;
+        //[self.mapView setShowsUserLocation:false];
+        if(self.myLocationMarker) {
+            [self.mapView removeAnnotation:self.myLocationMarker];
         }
-        [self.myLocation start];
+        [self centerMapOnOrder];
+    } else {
+        if(!self.locationService) {
+            self.locationService = [[LocationService alloc] init];
+        }
+        [self.locationService start];
+        self.isMyLocationStart = true;
+        //[self.mapView setShowsUserLocation:true];
+        if(self.myLocationMarker) {
+            [self.mapView removeAnnotation:self.myLocationMarker];
+        }
+        
+        self.location = self.locationService.currentLocation;
+        [self showMyLocation];
     }
 }
 
--(void) orderButtonDidTap:(UIButton *)sender {
-    OrdersListViewController *ordersListViewController = [[OrdersListViewController alloc]init];
-    ordersListViewController.orders = [self.orders copy];
-    [self.navigationController pushViewController:ordersListViewController animated:YES];
-}
-
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
-    
+    //MKPinAnnotationView - можно менять цвет
     static NSString *identifire = @"MarkerIdentifier";
     MKAnnotationView *annotationView = (MKMarkerAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:identifire];
     if (!annotationView) {
         annotationView = [[MKMarkerAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifire];
         annotationView.canShowCallout = true;
         annotationView.calloutOffset = CGPointMake(-5.0, 5.0);
-        
-        UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-        [infoButton addTarget:self action:@selector(pressInfoButton) forControlEvents:UIControlEventTouchUpInside];
-        
-        annotationView.rightCalloutAccessoryView = infoButton;
     }
+    AnnotationInfoButton *infoButton = [AnnotationInfoButton buttonWithType:UIButtonTypeDetailDisclosure];
+    infoButton.annotation = [[MKPointAnnotation alloc] init];
+    infoButton.annotation = annotation;
+    [infoButton addTarget:self action:@selector(pressInfoButton:) forControlEvents:UIControlEventTouchUpInside];
+    
+    annotationView.rightCalloutAccessoryView = infoButton;
+    
     annotationView.annotation = annotation;
     return annotationView;
 }
 
-- (void) pressInfoButton {
-//    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:[[NSString alloc] initWithFormat:@"Заказ: %@",order.number] message:[[NSString alloc] initWithFormat:@"%@ \nТел: %@   Имя: %@\n Сумма: %@",order.address, order.phone, order.name, order.total] preferredStyle:UIAlertControllerStyleAlert];
-//    [alertController addAction:[UIAlertAction actionWithTitle:@"Закрыть" style:UIAlertActionStyleDefault handler:nil]];
-//    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+- (void) pressInfoButton: (AnnotationInfoButton *) sender {
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:sender.annotation.title message: sender.annotation.subtitle preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void) updateCurrentLocation: (NSNotification *)notification {
-    CLLocation *currentLocation = notification.object;
-    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-    annotation.title = @"Я";
-    annotation.coordinate = currentLocation.coordinate;
-
-    [self.mapView addAnnotation:annotation];
     
+    if(self.isMyLocationStart) {
+        self.location = (CLLocation *)notification.object;
+        if(self.myLocationMarker) {
+            [self.mapView removeAnnotation:self.myLocationMarker];
+        }
+        [self showMyLocation];
+    }
 }
 
 @end

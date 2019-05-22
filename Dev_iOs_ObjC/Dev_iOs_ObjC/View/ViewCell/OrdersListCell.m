@@ -7,11 +7,10 @@
 //
 
 #import "OrdersListCell.h"
+#import "Order.h"
 
 @interface OrdersListCell ()
 @property (nonatomic) Order *order;
-@property (nonatomic) Delivery *delivery;
-@property NSInteger source;
 
 @property (nonatomic, strong) UILabel *numberAndTotal;
 @property (nonatomic, strong) UILabel *address;
@@ -41,8 +40,11 @@
         [self.deliveredButton setTitle:@"Доставлено" forState:UIControlStateNormal];
         self.deliveredButton.backgroundColor = [UIColor greenColor];
         [self.deliveredButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-//        [self.deliveredButton.layer setCornerRadius:15];
         [self.deliveredButton addTarget: self action:@selector(deliveredButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
+        [self.deliveredButton setShowsTouchWhenHighlighted:YES];
+        [self.deliveredButton.layer setShadowColor:[[UIColor blackColor] CGColor]];
+        [self.deliveredButton.layer setShadowOffset:CGSizeMake(5,5)];
+        [self.deliveredButton.layer setShadowOpacity: 0.5];
         [self.deliveredButton setHidden:YES];
         [self.contentView addSubview:self.deliveredButton];
         
@@ -53,10 +55,10 @@
 - (void) layoutSubviews {
     [self setSelectionStyle:UITableViewCellSelectionStyleNone];
     
-    self.numberAndTotal.frame = CGRectMake(10, 10, self.bounds.size.width-20, 30);
-    self.address.frame = CGRectMake(10, 45, self.bounds.size.width-20, 30);
-    self.phoneAndName.frame = CGRectMake(10, 80, self.bounds.size.width-20, 30);
-    self.deliveredButton.frame = CGRectMake(10, 125, self.bounds.size.width-20, 30);
+    self.numberAndTotal.frame = CGRectMake(10, 5, self.bounds.size.width-20, 30);
+    self.address.frame = CGRectMake(10, 38, self.bounds.size.width-20, 30);
+    self.phoneAndName.frame = CGRectMake(10, 72, self.bounds.size.width-20, 30);
+    self.deliveredButton.frame = CGRectMake(10, 105, self.bounds.size.width-20, 30);
 }
 
 - (void)awakeFromNib {
@@ -67,36 +69,24 @@
     [super setSelected:selected animated:animated];
     
     [self.deliveredButton setHidden:YES];
-    if(selected == YES && self.source == 0) {
+    if(selected == YES) {
         [self.deliveredButton setHidden:NO];
     }
 }
 
-- (void) config:(nullable Order *)order andDelivery:(nullable Delivery *)delivery andSource: (NSInteger) source {
-    self.source = source;
-    if(source == 0) {
-        self.order = order;
-        [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"№ %@   Сумма: %@",order.number, order.total]];
-        [self.address setText:[[NSString alloc] initWithFormat:@"Адрес: %@",order.address]];
-        [self.phoneAndName setText:[[NSString alloc] initWithFormat:@"Тел: %@   Имя: %@",order.phone, order.name]];
-        [self.address setHidden:NO];
-        [self.phoneAndName setHidden:NO];
-        [self.deliveredButton setHidden:YES];
-    } else if(source == 1) {
-        self.delivery = delivery;
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
-        [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"%@ Заказ №%@   Сумма: %@", [dateFormatter stringFromDate:delivery.date], delivery.orderNumber, delivery.orderTotal]];
-        [self.address setHidden:YES];
-        [self.phoneAndName setHidden:YES];
-        [self.deliveredButton setHidden:YES];
-    }
+- (void) config:(Order *)order {
+    self.order = order;
+    
+    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"№ %@   Сумма: %@",order.number, order.total]];
+    [self.address setText:[[NSString alloc] initWithFormat:@"Адрес: %@",order.address]];
+    [self.phoneAndName setText:[[NSString alloc] initWithFormat:@"Тел: %@   Имя: %@",order.phone, order.name]];
+    [self.deliveredButton setHidden:YES];
 }
 
 -(void) deliveredButtonDidTap:(UIButton *)sender {
+    [self.delegate deliverOrder:self.order.number];
     NSLog(@"Заказ %@ доставлен", self.order.number);
     [self.deliveredButton setHidden:YES];
-//    [self.delegate deliverOrder:self.indexPath];
 }
 
 @end
