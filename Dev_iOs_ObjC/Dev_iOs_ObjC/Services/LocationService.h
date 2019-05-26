@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LocationService : NSObject
 
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) CLLocation *currentLocation;
+
 - (instancetype) init;
 - (void)start;
 - (void)stop;

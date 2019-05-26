@@ -8,15 +8,13 @@
 
 #import "OrdersListViewController.h"
 #import "OrdersListCell.h"
-#import "Order.h"
 
-@interface OrdersListViewController() <UITableViewDataSource, UITableViewDelegate, OrderCellDelegate>
+@interface OrdersListViewController() <UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, DeliveredOrderProtocol>
 
 @property (strong, nonatomic) UITableView *tableView;
-@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
-@property (strong, nonatomic) UISegmentedControl *segmentedControl;
+@property (strong, nonatomic) UISearchController *searchController;
 
-@property (strong, nonatomic) NSMutableArray *items;
+@property (strong, nonatomic) NSArray *filteredArray;
 
 @end
 
@@ -25,49 +23,74 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.deliveries = [[NSMutableArray alloc] init];
+    self.filteredArray = [self.dataManager.orders copy];
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style: UITableViewStylePlain];
     [self.tableView setDataSource:self];
     [self.tableView setDelegate:self];
     [self.view addSubview:self.tableView];
     
-    self.segmentedControl = [[UISegmentedControl alloc]initWithItems:@[@"Новые Заказы", @"Доставлено"]];
-    [self.segmentedControl addTarget:self action:@selector(changeSource) forControlEvents:UIControlEventValueChanged];
-    [self.segmentedControl setTintColor:[UIColor blackColor]];
-    self.navigationItem.titleView = self.segmentedControl;
-    self.segmentedControl.selectedSegmentIndex = 0;
-    [self changeSource];
+    self.searchController = [[UISearchController alloc]initWithSearchResultsController:nil];
+    self.searchController.dimsBackgroundDuringPresentation = false;
+    self.searchController.searchResultsUpdater = self;
+    self.tableView.tableHeaderView = self.searchController.searchBar;
 }
 
-- (void) changeSource {
-    switch(self.segmentedControl.selectedSegmentIndex) {
-        case 0:
-            self.items = self.orders;
-            break;
-        case 1:
-            self.items = self.deliveries;
-            break;
-        default:
-            break;
+- (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    if(searchController.searchBar.text.length > 0) {
+        self.filteredArray =  [self filterOrders:self.searchController.searchBar.text];
+    } else {
+        self.filteredArray = [self.dataManager.orders copy];
     }
     [self.tableView reloadData];
 }
 
-- (void) deliverOrder: (NSIndexPath *) indexPath {
-    Order *order = self.orders[indexPath.row];
-    Delivery *delivery = [[Delivery alloc]initWithOrder:order];
-    [self.deliveries addObject: delivery];
+- (NSArray *) filterOrders:(NSString *)text {
     
-    [self.orders removeObjectAtIndex:indexPath.row];
-    [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    [self changeSource];
+    NSMutableArray *result = [[NSMutableArray alloc]init];
+    
+    for(Order *order in self.dataManager.orders) {
+        NSString *stringForSearch = [[NSString alloc]initWithFormat:@"%@ %@ %@ %@",order.number, order.address, order.name, order.total];
+        if([stringForSearch containsString:text]) {
+            [result addObject: order];
+        }
+    }
+    return [result copy];
+}
+
+- (void) deliverOrder: (NSNumber *) orderNumber {
+    
+    NSUInteger index = [self seachOrderByNumber: orderNumber];
+    if(index >= 0) {
+        Order *order = self.dataManager.orders[index];
+        [self.dataManager.orders removeObjectAtIndex:index];
+        Delivery *delivery = [[Delivery alloc]initWithOrder:order];
+        [self.dataManager.deliveries addObject: delivery];
+        
+        if(self.searchController.searchBar.text.length > 0) {
+            self.filteredArray =  [self filterOrders:self.searchController.searchBar.text];
+        } else {
+            self.filteredArray = [self.dataManager.orders copy];
+        }
+        [self.tableView reloadData];
+    }
+}
+
+- (NSInteger) seachOrderByNumber: (NSNumber *)orderNumber {
+    NSInteger i = 0;
+    for(Order *order in self.dataManager.orders) {
+        if(order.number == orderNumber) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
 }
 
 #pragma mark -- UITableViewDataSource
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.items.count;
+    return self.filteredArray.count;
 }
 
 -  (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -77,22 +100,14 @@
         cell = [[OrdersListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"OrderCell"];
     }
     
-    if(self.segmentedControl.selectedSegmentIndex == 0) {
-        Order *order = self.orders[indexPath.row];
-        [cell config:order andDelivery:nil andSource:0];
-    }
-    
-    if(self.segmentedControl.selectedSegmentIndex == 1) {
-        Delivery *delivery = self.deliveries[indexPath.row];
-        [cell config:nil andDelivery:delivery andSource:1];
-    }
+    Order *order = self.filteredArray[indexPath.row];
+    [cell config: order];
     cell.delegate = self;
     
     return cell;
 }
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 165;
+    return 140;
 }
 
 @end

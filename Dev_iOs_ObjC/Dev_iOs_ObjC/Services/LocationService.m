@@ -10,9 +10,6 @@
 
 @interface LocationService () <CLLocationManagerDelegate>
 
-@property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) CLLocation *currentLocation;
-
 @end
 
 @implementation LocationService
@@ -41,7 +38,6 @@
     
     if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
         NSLog(@"Пользователь разрешил");
-        [self start];
     } else if(status != kCLAuthorizationStatusNotDetermined) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Внимание!" message:@"GPS Выключен" preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:[UIAlertAction actionWithTitle:@"Закрыть" style:UIAlertActionStyleDefault handler:nil]];
