@@ -8,6 +8,7 @@
 
 #import "OrdersListViewController.h"
 #import "OrdersListCell.h"
+#import "CoreDataService.h"
 
 @interface OrdersListViewController() <UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, DeliveredOrderProtocol>
 
@@ -65,7 +66,8 @@
         Order *order = self.dataManager.orders[index];
         [self.dataManager.orders removeObjectAtIndex:index];
         Delivery *delivery = [[Delivery alloc]initWithOrder:order];
-        [self.dataManager.deliveries addObject: delivery];
+        [self.dataManager.deliveries addObject: delivery];        
+        [[CoreDataService sharedInstance] addDelivery:delivery];
         
         if(self.searchController.searchBar.text.length > 0) {
             self.filteredArray =  [self filterOrders:self.searchController.searchBar.text];

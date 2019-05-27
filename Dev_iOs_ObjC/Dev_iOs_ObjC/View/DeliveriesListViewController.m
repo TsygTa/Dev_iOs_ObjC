@@ -8,10 +8,12 @@
 
 #import "DeliveriesListViewController.h"
 #import "DeliveriesListCell.h"
+#import "CoreDataService.h"
 
 @interface DeliveriesListViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) UITableView *tableView;
+@property (strong, nonatomic) NSArray *deliveries;
 
 @end
 
@@ -29,12 +31,15 @@
 -(void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.tableView reloadData];
+    
+    self.deliveries = [[NSArray alloc] initWithArray:[[CoreDataService sharedInstance] deliveries]];
+    [self.tableView reloadData];
 }
 
 #pragma mark -- UITableViewDataSource
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.dataManager.deliveries.count;
+    return self.deliveries.count;
 }
 
 -  (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -44,7 +49,7 @@
         cell = [[DeliveriesListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"DeliveryCell"];
     }
     
-    Delivery *delivery = self.dataManager.deliveries[indexPath.row];
+    Delivery *delivery =  [[CoreDataService sharedInstance] deliveryCDToDelirery:self.deliveries[indexPath.row]];
     [cell config: delivery];
     
     return cell;

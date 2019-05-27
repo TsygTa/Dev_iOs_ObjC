@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "MainViewController.h"
 #import "DataManager.h"
+#import "CoreDataService.h"
 
 @interface AppDelegate ()
 
@@ -20,6 +21,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     MainViewController *firstViewController = [[MainViewController alloc]init];
+    [CoreDataService sharedInstance];
     firstViewController.dataManager  = [[DataManager alloc] sharedInstance];
     UINavigationController *navigationController = [[UINavigationController alloc]initWithRootViewController:firstViewController];
     self.window.rootViewController = navigationController;
