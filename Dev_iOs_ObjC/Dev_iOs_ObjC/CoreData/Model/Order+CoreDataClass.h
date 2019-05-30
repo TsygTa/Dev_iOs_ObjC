@@ -1,8 +1,8 @@
 //
-//  OrderCD+CoreDataClass.h
+//  Order+CoreDataClass.h
 //  Dev_iOs_ObjC
 //
-//  Created by Tatiana Tsygankova on 27/05/2019.
+//  Created by Tatiana Tsygankova on 29/05/2019.
 //  Copyright © 2019 Tatiana Tsygankova. All rights reserved.
 //
 //
@@ -12,10 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface OrderCD : NSManagedObject
+@interface Order : NSManagedObject
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#import "OrderCD+CoreDataProperties.h"
+#import "Order+CoreDataProperties.h"

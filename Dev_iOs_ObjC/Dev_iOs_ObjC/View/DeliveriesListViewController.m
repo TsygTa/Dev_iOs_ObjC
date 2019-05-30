@@ -30,7 +30,6 @@
 
 -(void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.tableView reloadData];
     
     self.deliveries = [[NSArray alloc] initWithArray:[[CoreDataService sharedInstance] deliveries]];
     [self.tableView reloadData];
@@ -49,7 +48,7 @@
         cell = [[DeliveriesListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"DeliveryCell"];
     }
     
-    Delivery *delivery =  [[CoreDataService sharedInstance] deliveryCDToDelirery:self.deliveries[indexPath.row]];
+    Delivery *delivery =  self.deliveries[indexPath.row];
     [cell config: delivery];
     
     return cell;

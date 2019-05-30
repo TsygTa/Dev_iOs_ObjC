@@ -9,14 +9,12 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import "LocationService.h"
-#import "DataManager.h"
 #import "AnnotationInfoButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MapViewController : UIViewController
 
-@property (strong, nonatomic) DataManager *dataManager;
 @property (nonatomic, strong) CLLocation *location;
 
 @end

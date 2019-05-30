@@ -17,21 +17,18 @@
 
 @implementation TabBarController
 
-- (instancetype) initWithDataManager:(DataManager *) dataManager {
+- (instancetype) init {
     self = [super init];
-    self.dataManager = dataManager;
+    
     if(self) {
         MapViewController *mapViewController = [[MapViewController alloc]init];
-        mapViewController.dataManager = self.dataManager;
         
         mapViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Карта" image:[self prepareImage:[UIImage imageNamed:@"map_icon"]] tag:0];
         
         OrdersListViewController *ordersViewController = [[OrdersListViewController alloc]init];
-        ordersViewController.dataManager = self.dataManager;
         ordersViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Список" image:[self prepareImage:[UIImage imageNamed:@"list_icon"]] tag:1];
         
         DeliveriesListViewController *deliveriesViewController = [[DeliveriesListViewController alloc]init];
-        deliveriesViewController.dataManager = self.dataManager;
         deliveriesViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Доставлено" image:[self prepareImage:[UIImage imageNamed:@"done_icon"]] tag:2];;
         
         self.viewControllers = @[mapViewController,ordersViewController,deliveriesViewController];

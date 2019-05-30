@@ -38,6 +38,16 @@
         }
         self.context = self.persistentContainer.viewContext;
     }];
+    
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Order"];
+    NSBatchDeleteRequest *delete = [[NSBatchDeleteRequest alloc] initWithFetchRequest:request];
+    
+    [self.context executeRequest:delete error:nil];
+    
+    request = [[NSFetchRequest alloc] initWithEntityName:@"Delivery"];
+    delete = [[NSBatchDeleteRequest alloc] initWithFetchRequest:request];
+    
+    [self.context executeRequest:delete error:nil];
 }
 
 - (void)save {
@@ -48,64 +58,43 @@
     }
 }
 
-
-- (void)addOrder:(Order *)order {
-    OrderCD *item = [NSEntityDescription insertNewObjectForEntityForName:@"OrderCD" inManagedObjectContext:self.context];
-    item.number = [order.number intValue];
-    item.name = order.name;
-    item.address = order.address;
-    item.phone = order.phone;
-    item.total = [order.total intValue];
-    item.lattitude = [order coordinate].latitude;
-    item.longitude = [order coordinate].longitude;
+- (void)addOrderWithDictionary:(NSDictionary *)dictionary {
+    Order *item = [NSEntityDescription insertNewObjectForEntityForName:@"Order" inManagedObjectContext:self.context];
+    item.number = [[dictionary valueForKey:@"number"] intValue];
+    item.name = [[NSString alloc] initWithFormat:@"%@ %@",[dictionary valueForKey:@"name"],[dictionary valueForKey:@"surname"]];
+    item.address = [[NSString alloc] initWithFormat:@"%@ %@ %@",[dictionary valueForKey:@"building"],[dictionary valueForKey:@"street"],[dictionary valueForKey:@"city"]];
+    item.phone = [dictionary valueForKey:@"phone"];
+    item.total = [[dictionary valueForKey:@"total"] doubleValue];
+    item.latitude = [[dictionary valueForKey:@"latitude"] doubleValue];
+    item.longitude = [[dictionary valueForKey:@"longitude"] doubleValue];
     [self save];
 }
 
 - (NSArray*)orders {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"OrderCD"];
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Order"];
     request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"number" ascending:true]];
     return [self.context executeFetchRequest:request error:nil];
 }
 
-- (void) removeOrder:(OrderCD *)order {
+- (void) removeOrder:(Order *)order {
     [self.context deleteObject:order];
     [self save];
 }
 
 - (NSArray*)deliveries {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"DeliveryCD"];
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Delivery"];
     request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:true]];
     return [self.context executeFetchRequest:request error:nil];
 }
 
-- (void)addDelivery:(Delivery *)delivery {
-    DeliveryCD *item = [NSEntityDescription insertNewObjectForEntityForName:@"DeliveryCD" inManagedObjectContext:self.context];
+- (void) addDeliveryWithOrder: (Order *)order {
+    Delivery *item = [NSEntityDescription insertNewObjectForEntityForName:@"Delivery" inManagedObjectContext:self.context];
     
-    item.date = [delivery.date timeIntervalSince1970];
-    item.orderNumber = [delivery.orderNumber intValue];
-    item.orderTotal = [delivery.orderTotal intValue];
-    item.lattitude = [delivery coordinate].latitude;
-    item.longitude = [delivery coordinate].longitude;
+    item.date = [[NSDate date] timeIntervalSince1970];
+    item.orderNumber = order.number;
+    item.orderTotal = order.total;
+    item.latitude = order.latitude;
+    item.longitude = order.longitude;
     [self save];
-}
-
-- (Order *) orderCDToOrder: (OrderCD *) orderCD {
-    Order * order = [[Order alloc] init];
-    order.number = [[NSNumber alloc] initWithInt:orderCD.number];
-    order.name = orderCD.name;
-    order.address = orderCD.address;
-    order.phone = orderCD.phone;
-    order.total = [[NSNumber alloc] initWithInt:orderCD.total];
-    order.coordinate = CLLocationCoordinate2DMake(orderCD.lattitude, orderCD.longitude);
-    return order;
-}
-
-- (Delivery *) deliveryCDToDelirery: (DeliveryCD *) deliveryCD {
-    Delivery * delivery = [[Delivery alloc] init];
-    delivery.orderNumber = [[NSNumber alloc] initWithInt:deliveryCD.orderNumber];
-    delivery.date = [[NSDate alloc] initWithTimeIntervalSince1970:deliveryCD.date];
-    delivery.orderTotal = [[NSNumber alloc] initWithInt:deliveryCD.orderTotal];
-    delivery.coordinate = CLLocationCoordinate2DMake(deliveryCD.lattitude, deliveryCD.longitude);
-    return delivery;
 }
 @end

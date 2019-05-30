@@ -48,19 +48,11 @@
     [dataTask resume];
 }
 
-- (void)getOrders:(NSString*)deviceId withCompletion:(void(^)(NSArray *orders))completion {
+- (void)getOrders:(NSString*)deviceId withCompletion:(void(^)(NSArray *arrayJSON))completion {
     // Получаем курсы валют
     [self load:API_URL withCompletion:^(id  _Nullable result) {
-        NSArray *arrayJSON = result;
-        
-        NSMutableArray *resultOrders = [NSMutableArray new];
-        
-        for (int i=0; i<arrayJSON.count; i++) {
-            NSDictionary *json = arrayJSON[i];
-            
-            [resultOrders addObject:[[Order alloc] initWithDictionary:json]];
-        }
-        completion(resultOrders);
+        NSArray *array = result;
+        completion(array);
     }];
 }
 

@@ -8,13 +8,13 @@
 
 #import "OrdersListViewController.h"
 #import "OrdersListCell.h"
-#import "CoreDataService.h"
 
 @interface OrdersListViewController() <UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, DeliveredOrderProtocol>
 
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) UISearchController *searchController;
 
+@property (strong, nonatomic) NSMutableArray *orders;
 @property (strong, nonatomic) NSArray *filteredArray;
 
 @end
@@ -23,8 +23,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.filteredArray = [self.dataManager.orders copy];
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style: UITableViewStylePlain];
     [self.tableView setDataSource:self];
@@ -37,11 +35,19 @@
     self.tableView.tableHeaderView = self.searchController.searchBar;
 }
 
+-(void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.orders = [[NSMutableArray alloc] initWithArray:[[CoreDataService sharedInstance] orders]];
+    self.filteredArray = [self.orders copy];
+    [self.tableView reloadData];
+}
+
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     if(searchController.searchBar.text.length > 0) {
         self.filteredArray =  [self filterOrders:self.searchController.searchBar.text];
     } else {
-        self.filteredArray = [self.dataManager.orders copy];
+        self.filteredArray = [self.orders copy];
     }
     [self.tableView reloadData];
 }
@@ -50,8 +56,8 @@
     
     NSMutableArray *result = [[NSMutableArray alloc]init];
     
-    for(Order *order in self.dataManager.orders) {
-        NSString *stringForSearch = [[NSString alloc]initWithFormat:@"%@ %@ %@ %@",order.number, order.address, order.name, order.total];
+    for(Order *order in self.orders) {
+        NSString *stringForSearch = [[NSString alloc]initWithFormat:@"%@ %@ %@ %@", [[NSNumber alloc] initWithInt:order.number], order.address, order.name, [[NSNumber alloc] initWithInt:order.total]];
         if([stringForSearch containsString:text]) {
             [result addObject: order];
         }
@@ -59,34 +65,19 @@
     return [result copy];
 }
 
-- (void) deliverOrder: (NSNumber *) orderNumber {
-    
-    NSUInteger index = [self seachOrderByNumber: orderNumber];
-    if(index >= 0) {
-        Order *order = self.dataManager.orders[index];
-        [self.dataManager.orders removeObjectAtIndex:index];
-        Delivery *delivery = [[Delivery alloc]initWithOrder:order];
-        [self.dataManager.deliveries addObject: delivery];        
-        [[CoreDataService sharedInstance] addDelivery:delivery];
+- (void) deliverOrder: (Order *) order {
+    if(order) {
+        [[CoreDataService sharedInstance] addDeliveryWithOrder: order];
+        [[CoreDataService sharedInstance] removeOrder: order];
         
+        self.orders = [[NSMutableArray alloc] initWithArray:[[CoreDataService sharedInstance] orders]];
         if(self.searchController.searchBar.text.length > 0) {
             self.filteredArray =  [self filterOrders:self.searchController.searchBar.text];
         } else {
-            self.filteredArray = [self.dataManager.orders copy];
+            self.filteredArray = [self.orders copy];
         }
         [self.tableView reloadData];
     }
-}
-
-- (NSInteger) seachOrderByNumber: (NSNumber *)orderNumber {
-    NSInteger i = 0;
-    for(Order *order in self.dataManager.orders) {
-        if(order.number == orderNumber) {
-            return i;
-        }
-        i++;
-    }
-    return -1;
 }
 
 #pragma mark -- UITableViewDataSource

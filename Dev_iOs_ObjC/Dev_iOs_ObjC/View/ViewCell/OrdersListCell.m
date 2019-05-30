@@ -7,10 +7,9 @@
 //
 
 #import "OrdersListCell.h"
-#import "Order.h"
 
 @interface OrdersListCell ()
-@property (nonatomic) Order *order;
+@property (nonatomic, strong) Order *order;
 
 @property (nonatomic, strong) UILabel *numberAndTotal;
 @property (nonatomic, strong) UILabel *address;
@@ -40,7 +39,7 @@
         [self.deliveredButton setTitle:@"Доставлено" forState:UIControlStateNormal];
         self.deliveredButton.backgroundColor = [UIColor greenColor];
         [self.deliveredButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [self.deliveredButton addTarget: self action:@selector(deliveredButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
+        [self.deliveredButton addTarget: self action:@selector(deliveredButtonDidTap) forControlEvents:UIControlEventTouchUpInside];
         [self.deliveredButton setShowsTouchWhenHighlighted:YES];
         [self.deliveredButton.layer setShadowColor:[[UIColor blackColor] CGColor]];
         [self.deliveredButton.layer setShadowOffset:CGSizeMake(5,5)];
@@ -77,15 +76,14 @@
 - (void) config:(Order *)order {
     self.order = order;
     
-    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"№ %@   Сумма: %@",order.number, order.total]];
+    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"№ %@   Сумма: %@", [[NSNumber alloc] initWithInt:order.number], [[NSNumber alloc] initWithInt:order.total]]];
     [self.address setText:[[NSString alloc] initWithFormat:@"Адрес: %@",order.address]];
     [self.phoneAndName setText:[[NSString alloc] initWithFormat:@"Тел: %@   Имя: %@",order.phone, order.name]];
     [self.deliveredButton setHidden:YES];
 }
 
--(void) deliveredButtonDidTap:(UIButton *)sender {
-    [self.delegate deliverOrder:self.order.number];
-    NSLog(@"Заказ %@ доставлен", self.order.number);
+-(void) deliveredButtonDidTap {
+    [self.delegate deliverOrder: self.order];
     [self.deliveredButton setHidden:YES];
 }
 

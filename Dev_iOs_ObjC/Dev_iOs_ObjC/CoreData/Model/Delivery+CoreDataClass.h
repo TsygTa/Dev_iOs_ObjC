@@ -1,8 +1,8 @@
 //
-//  DeliveryCD+CoreDataClass.h
+//  Delivery+CoreDataClass.h
 //  Dev_iOs_ObjC
 //
-//  Created by Tatiana Tsygankova on 27/05/2019.
+//  Created by Tatiana Tsygankova on 29/05/2019.
 //  Copyright © 2019 Tatiana Tsygankova. All rights reserved.
 //
 //
@@ -12,10 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DeliveryCD : NSManagedObject
+@interface Delivery : NSManagedObject
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#import "DeliveryCD+CoreDataProperties.h"
+#import "Delivery+CoreDataProperties.h"

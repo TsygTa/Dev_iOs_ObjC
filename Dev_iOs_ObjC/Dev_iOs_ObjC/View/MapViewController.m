@@ -7,12 +7,16 @@
 //
 
 #import "MapViewController.h"
+#import "CoreDataService.h"
 
 @interface MapViewController() <MKMapViewDelegate>
 
 @property(nonatomic, strong) MKMapView *mapView;
 @property (nonatomic, strong) LocationService *locationService;
 @property (nonatomic, strong) MKPointAnnotation *myLocationMarker;
+
+@property(nonatomic, strong) NSArray *orders;
+@property(nonatomic, strong) NSArray *deliveries;
 
 @property BOOL isMyLocationStart;
 
@@ -28,8 +32,6 @@
     
     [self.view addSubview:self.mapView];
     self.isMyLocationStart = false;
-    
-    [self centerMapOnOrder];
     
     UIButton *zoomInButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - 60, [UIScreen mainScreen].bounds.size.height/2 - 85, 50, 50)];
     [zoomInButton setImage:[UIImage imageNamed:@"monitoring_zoom_in_button_icon.png"] forState:UIControlStateNormal];
@@ -51,13 +53,15 @@
     myLocationButton.layer.cornerRadius = 25;
     [myLocationButton addTarget: self action:@selector(myLocationDidTap:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview: myLocationButton];
-    [self showOrdersOnMap];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCurrentLocation:) name:kLocationServiceDidUpdateCurrentLocation object:nil];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.mapView removeAnnotations:[self.mapView annotations]];
+    self.orders = [[CoreDataService sharedInstance] orders];
+    self.deliveries = [[CoreDataService sharedInstance] deliveries];
+    [self centerMapOnOrder];
     [self showOrdersOnMap];
 }
 
@@ -67,8 +71,10 @@
 
 - (void) centerMapOnOrder {
     MKCoordinateRegion region;
-    if(self.dataManager.orders.count > 0) {
-        region = MKCoordinateRegionMakeWithDistance(((Order *)self.dataManager.orders[0]).coordinate, 20000, 20000);
+    if(self.orders.count > 0) {
+        Order *order = self.orders[0];
+        
+        region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(order.latitude, order.longitude), 20000, 20000);
     } else {
         region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(55.751999, 37.617734), 20000, 20000);
     }
@@ -76,21 +82,21 @@
 }
 
 - (void) showOrdersOnMap {
-    for(Order *order in self.dataManager.orders) {
+    for(Order *order in self.orders) {
         MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-        annotation.title = [[NSString alloc] initWithFormat:@"Заказ № %@",order.number];
-        annotation.subtitle = [[NSString alloc] initWithFormat:@"%@\nСумма: %@\nТел: %@\nИмя: %@", order.address, order.total, order.phone, order.name];
-        annotation.coordinate = order.coordinate;
+        annotation.title = [[NSString alloc] initWithFormat:@"Заказ № %@", [[NSNumber alloc] initWithInt:order.number]];
+        annotation.subtitle = [[NSString alloc] initWithFormat:@"%@\nСумма: %@\nТел: %@\nИмя: %@", order.address, [[NSNumber alloc] initWithInt: order.total], order.phone, order.name];
+        annotation.coordinate = CLLocationCoordinate2DMake(order.latitude, order.longitude);
         
         [self.mapView addAnnotation:annotation];
     }
-    for(Delivery *delivery in self.dataManager.deliveries) {
+    for(Delivery *delivery in self.deliveries) {
         MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
-        annotation.title = [[NSString alloc] initWithFormat:@"Доставлено № %@",delivery.orderNumber];
-        annotation.subtitle = [[NSString alloc] initWithFormat:@"Заказ №%@\nСумма: %@\nДоставлено: %@", delivery.orderNumber, delivery.orderTotal, [dateFormatter stringFromDate:delivery.date]];
-        annotation.coordinate = delivery.coordinate;
+        annotation.title = [[NSString alloc] initWithFormat:@"Доставлено № %@", [[NSNumber alloc] initWithInt: delivery.orderNumber]];
+        annotation.subtitle = [[NSString alloc] initWithFormat:@"Заказ №%@\nСумма: %@\nДоставлено: %@", [[NSNumber alloc] initWithInt: delivery.orderNumber], [[NSNumber alloc] initWithInt: delivery.orderTotal], [dateFormatter stringFromDate:[[NSDate alloc] initWithTimeIntervalSince1970:delivery.date]]];
+        annotation.coordinate = CLLocationCoordinate2DMake(delivery.latitude, delivery.longitude);
         
         [self.mapView addAnnotation:annotation];
     }

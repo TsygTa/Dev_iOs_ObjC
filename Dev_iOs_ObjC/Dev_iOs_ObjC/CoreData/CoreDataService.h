@@ -7,22 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "OrderCD+CoreDataClass.h"
-#import "DeliveryCD+CoreDataClass.h"
-#import "Order.h"
-#import "Delivery.h"
+#import "Order+CoreDataClass.h"
+#import "Delivery+CoreDataClass.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CoreDataService : NSObject
-+(instancetype)sharedInstance;
-- (void)addOrder:(Order *) order;
-- (NSArray*)orders;
-- (void)removeOrder:(Order *) order;
-- (void)addDelivery:(Delivery *) delivery;
-- (NSArray*)deliveries;
-- (Order *) orderCDToOrder: (OrderCD *) orderCD;
-- (Delivery *) deliveryCDToDelirery: (DeliveryCD *) deliveryCD;
++ (instancetype) sharedInstance;
+- (void)addOrderWithDictionary:(NSDictionary *)dictionary;
+- (NSArray*) orders;
+- (void) removeOrder:(Order *) order;
+- (void) addDeliveryWithOrder:(Order *) order;
+- (NSArray*) deliveries;
 @end
 
 NS_ASSUME_NONNULL_END

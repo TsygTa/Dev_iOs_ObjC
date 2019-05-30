@@ -7,16 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DataManager.h"
+#import "CoreDataService.h"
 
 @protocol DeliveredOrderProtocol <NSObject>
 
-- (void) deliverOrder: (NSNumber *) orderNumber;
+- (void) deliverOrder: (Order *) order;
 
 @end
 
 @interface OrdersListViewController : UIViewController
-
-@property (strong, nonatomic) DataManager *dataManager;
 
 @end
