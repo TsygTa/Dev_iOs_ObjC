@@ -9,10 +9,15 @@
 #import "MainViewController.h"
 #import "TabBarController.h"
 #import "NetworkService.h"
+#import "CoreDataService.h"
+#import <UserNotifications/UserNotifications.h>
+#import <UserNotificationsUI/UserNotificationsUI.h>
+#import "PageViewController.h"
+#import "ProgressView.h"
 
 #define TEST_FLAG 1
 
-@interface MainViewController ()
+@interface MainViewController () <UNUserNotificationCenterDelegate>
 
 @property (nonatomic, strong) UIImageView* antennaImage;
 @property (nonatomic, strong) UIView *gpsMessageView;
@@ -24,6 +29,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!error) {
+            NSLog(@"Success");
+        }
+    }];
     
     UIImageView *logo = [[UIImageView alloc] initWithFrame:CGRectMake(20, 100, 50, 50)];
     logo.image = [UIImage imageNamed:@"Logo.png"];
@@ -62,7 +75,7 @@
     
     //[self.view addSubview:self.gpsMessageView];
     
-    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2 + 40, 150,30)];
+    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2-50, 150,30)];
     [ordersListButton setTitle:@"Заказы" forState:UIControlStateNormal];
     ordersListButton.backgroundColor = [UIColor whiteColor];
     [ordersListButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -72,9 +85,23 @@
     [ordersListButton.layer setShadowOffset:CGSizeMake(5,5)];
     [ordersListButton.layer setShadowOpacity: 0.5];
     [ordersListButton setShowsTouchWhenHighlighted:YES];
-    
     [ordersListButton addTarget: self action:@selector(orderButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
+    [ordersListButton setHidden:YES];
     [self.view addSubview: ordersListButton];
+    
+    UIButton *aboutApplicationButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2 + 50, 150,30)];
+    [aboutApplicationButton setTitle:@"О приложении" forState:UIControlStateNormal];
+    aboutApplicationButton.backgroundColor = [UIColor whiteColor];
+    [aboutApplicationButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    aboutApplicationButton.layer.borderWidth = 1;
+    aboutApplicationButton.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    [aboutApplicationButton.layer setShadowColor:[[UIColor blackColor] CGColor]];
+    [aboutApplicationButton.layer setShadowOffset:CGSizeMake(5,5)];
+    [aboutApplicationButton.layer setShadowOpacity: 0.5];
+    [aboutApplicationButton setShowsTouchWhenHighlighted:YES];
+    [aboutApplicationButton addTarget: self action:@selector(aboutApplicationButtonDidTap:) forControlEvents:UIControlEventTouchUpInside];
+    [aboutApplicationButton setHidden:YES];
+    [self.view addSubview: aboutApplicationButton];
     
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     self.activityIndicator.color = [UIColor blackColor];
@@ -82,32 +109,37 @@
     self.activityIndicator.hidesWhenStopped = YES;
     [self.view addSubview:self.activityIndicator];
     
-    [self.activityIndicator startAnimating];
-    self.dataManager.orders = [[NSMutableArray alloc] init];
-    self.dataManager.deliveries = [[NSMutableArray alloc] init];
+//    [self.activityIndicator startAnimating];
+    [[ProgressView sharedInstance] show: ^{}];
     
 #if TEST_FLAG
     [self prepareOrders];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self.activityIndicator stopAnimating];
-        [self prepareOrdersCoordinates];
-        TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
-        [self.navigationController pushViewController:tabBarController animated:YES];
+        //[self.activityIndicator stopAnimating];
+        [[ProgressView sharedInstance] dismiss: ^{
+         [ordersListButton setHidden:NO];
+         [aboutApplicationButton setHidden:NO];
+         }];
     });
 #else
-    [[NetworkService sharedInstance] getOrders: @"" withCompletion:^(NSArray * _Nonnull orders) {
+    [[NetworkService sharedInstance] getOrders: @"" withCompletion:^(NSArray * _Nonnull arrayJSON) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if(orders.count <= 0) {
+            
+            if(arrayJSON.count <= 0) {
                 [self prepareOrders];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 });
             } else {
-                self.dataManager.orders = [orders copy];
+                for (int i=0; i<arrayJSON.count; i++) {
+                    NSDictionary *json = arrayJSON[i];
+                    [[CoreDataService sharedInstance] addOrderWithDictionary: arrayJSON[i]];
+                }
             }
-            [self.activityIndicator stopAnimating];
-            [self prepareOrdersCoordinates];
-            TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
-            [self.navigationController pushViewController:tabBarController animated:YES];
+            //[self.activityIndicator stopAnimating];
+            [[ProgressView sharedInstance] dismiss: ^{
+                 [ordersListButton setHidden:NO];
+                 [aboutApplicationButton setHidden:NO];
+             }];
         });
     }];
 #endif
@@ -124,72 +156,100 @@
 }
 
 - (void) prepareOrders {
-    self.dataManager.orders = [[NSMutableArray alloc] initWithObjects:
-                   [[Order alloc] initWithDictionary: @{  @"number": @"555",
-                                                          @"name": @"Ольга",
-                                                          @"surname": @"Иванова",
-                                                          @"building": @"6",
-                                                          @"street": @"ул. 2-я Черногрязская",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"777-77-77",
-                                                          @"total": @"3200"}],
-                   [[Order alloc] initWithDictionary: @{  @"number": @"777",
-                                                          @"name": @"Петр",
-                                                          @"surname": @"Петров",
-                                                          @"building": @"137",
-                                                          @"street": @"Ленинский проспект",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"888-88-88",
-                                                          @"total": @"7567"}],
-                   [[Order alloc] initWithDictionary: @{  @"number": @"77",
-                                                          @"name": @"Ирина",
-                                                          @"surname": @"Сидорова",
-                                                          @"building": @"7",
-                                                          @"street": @"ул Цюрупы",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"999-99-99",
-                                                          @"total": @"7800"}],
-                   [[Order alloc] initWithDictionary: @{  @"number": @"99",
-                                                          @"name": @"Зоя",
-                                                          @"surname": @"Кузнецова",
-                                                          @"building": @"91",
-                                                          @"street": @"Ленинский проспект",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"111-11-11",
-                                                          @"total": @"9200"}],
-                   [[Order alloc] initWithDictionary: @{  @"number": @"44",
-                                                          @"name": @"Елена",
-                                                          @"surname": @"Власова",
-                                                          @"building": @"31",
-                                                          @"street": @"Каширское шоссе",
-                                                          @"city": @"Москва",
-                                                          @"longitude": @"0",
-                                                          @"latitude": @"0",
-                                                          @"phone": @"333-33-33",
-                                                          @"total": @"3000"}],
+    NSArray *orders = [[NSArray alloc] initWithObjects:
+                   @{ @"number": @"555",
+                      @"name": @"Ольга",
+                      @"surname": @"Иванова",
+                      @"building": @"6",
+                      @"street": @"ул. 2-я Черногрязская",
+                      @"city": @"Москва",
+                      @"longitude": @"37.548151",
+                      @"latitude": @"55.761629",
+                      @"phone": @"777-77-77",
+                      @"total": @"3200"},
+                   @{ @"number": @"777",
+                      @"name": @"Петр",
+                      @"surname": @"Петров",
+                      @"building": @"137",
+                      @"street": @"Ленинский проспект",
+                      @"city": @"Москва",
+                      @"longitude": @"37.472279",
+                      @"latitude": @"55.642047",
+                      @"phone": @"888-88-88",
+                      @"total": @"7567"},
+                   @{ @"number": @"77",
+                      @"name": @"Ирина",
+                      @"surname": @"Сидорова",
+                      @"building": @"7",
+                      @"street": @"ул Цюрупы",
+                      @"city": @"Москва",
+                      @"longitude": @"37.573510)",
+                      @"latitude": @"55.666127",
+                      @"phone": @"999-99-99",
+                      @"total": @"7800"},
+                    @{ @"number": @"99",
+                      @"name": @"Зоя",
+                      @"surname": @"Кузнецова",
+                      @"building": @"91",
+                      @"street": @"Ленинский проспект",
+                      @"city": @"Москва",
+                      @"longitude": @"37.529789",
+                      @"latitude": @"55.676646",
+                      @"phone": @"111-11-11",
+                      @"total": @"9200"},
+                    @{  @"number": @"44",
+                      @"name": @"Елена",
+                      @"surname": @"Власова",
+                      @"building": @"31",
+                      @"street": @"Каширское шоссе",
+                      @"city": @"Москва",
+                      @"longitude": @"37.664384",
+                      @"latitude": @"55.649865",
+                      @"phone": @"333-33-33",
+                      @"total": @"3000"},
                    nil];
+    for (int i=0; i< orders.count; i++) {
+        [[CoreDataService sharedInstance] addOrderWithDictionary:orders[i]];
+    }
 }
 
-- (void) prepareOrdersCoordinates {
+
+- (void) orderButtonDidTap:(UIButton *)sender {
     
-    ((Order *) self.dataManager.orders[0]).coordinate = CLLocationCoordinate2DMake(55.761629, 37.548151);
-    ((Order *) self.dataManager.orders[1]).coordinate = CLLocationCoordinate2DMake(55.642047, 37.472279);
-    ((Order *) self.dataManager.orders[2]).coordinate = CLLocationCoordinate2DMake(55.666127, 37.573510);
-    ((Order *) self.dataManager.orders[3]).coordinate = CLLocationCoordinate2DMake(55.676646, 37.529789);
-    ((Order *) self.dataManager.orders[4]).coordinate = CLLocationCoordinate2DMake(55.649865, 37.664384);
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = @"Внимание!";
+    content.body = @"Новый заказ";
+    content.sound = [UNNotificationSound defaultCriticalSound];
+    
+    NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [calendar componentsInTimeZone:[NSTimeZone systemTimeZone]
+                                                         fromDate:[NSDate new]];
+    NSDateComponents *newComponents = [[NSDateComponents alloc] init];
+    newComponents.calendar = calendar;
+    newComponents.timeZone = [NSTimeZone defaultTimeZone];
+    newComponents.month = components.month;
+    newComponents.day = components.day;
+    newComponents.hour = components.hour;
+    newComponents.minute = components.minute;
+    newComponents.second = components.second + 10;
+    
+    UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:newComponents repeats:false];
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"Notification"
+                                                                          content:content
+                                                                          trigger:trigger];
+    
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center addNotificationRequest:request withCompletionHandler:nil];
+    
+    TabBarController *tabBarController = [[TabBarController alloc]init];
+    [self.navigationController pushViewController:tabBarController animated:YES];
 }
 
--(void) orderButtonDidTap:(UIButton *)sender {
-    TabBarController *tabBarController = [[TabBarController alloc]initWithDataManager: self.dataManager];
-    [self.navigationController pushViewController:tabBarController animated:YES];
+- (void) aboutApplicationButtonDidTap:(UIButton *)sender {
+    
+    PageViewController *pageViewController = [[PageViewController alloc] init];
+    
+    [self.navigationController pushViewController:pageViewController animated:YES];
 }
                    
 @end

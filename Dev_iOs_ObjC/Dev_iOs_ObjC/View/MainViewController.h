@@ -7,11 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DataManager.h"
 
 @interface MainViewController : UIViewController
-
-@property (nonatomic, strong) DataManager *dataManager;
 
 @end
 

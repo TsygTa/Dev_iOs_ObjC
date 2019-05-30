@@ -8,8 +8,6 @@
 
 #import "DeliveriesListCell.h"
 
-#import "DeliveriesListCell.h"
-
 @interface DeliveriesListCell ()
 
 @property (nonatomic) Delivery *delivery;
@@ -53,8 +51,8 @@
 
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
-    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"Заказ №%@   Сумма: %@", delivery.orderNumber, delivery.orderTotal]];
-    [self.dateLabel setText:[[NSString alloc] initWithFormat:@"Доставлено: %@", [dateFormatter stringFromDate:delivery.date]]];
+    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"Заказ №%@   Сумма: %@", [[NSNumber alloc] initWithInt:delivery.orderNumber], [[NSNumber alloc] initWithInt:delivery.orderTotal]]];
+    [self.dateLabel setText:[[NSString alloc] initWithFormat:@"Доставлено: %@", [dateFormatter stringFromDate: [[NSDate date] initWithTimeIntervalSince1970:delivery.date]]]];
 }
 
 @end

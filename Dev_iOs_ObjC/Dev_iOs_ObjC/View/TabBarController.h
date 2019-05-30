@@ -7,14 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DataManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TabBarController : UITabBarController
 
-- (instancetype) initWithDataManager:(DataManager *) dataManager;
-@property (strong, nonatomic) DataManager *dataManager;
+- (instancetype) init;
 
 @end
 
