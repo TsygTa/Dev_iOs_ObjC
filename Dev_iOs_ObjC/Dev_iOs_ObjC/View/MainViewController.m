@@ -30,6 +30,8 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
+    self.navigationItem.title = @"";
+    
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
     [center requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
@@ -47,7 +49,7 @@
     appName.font = [UIFont systemFontOfSize:32.0 weight: UIFontWeightBold];
     appName.textColor = [UIColor darkGrayColor];
     appName.textAlignment = NSTextAlignmentLeft;
-    appName.text = @"Курьер";
+    appName.text = NSLocalizedString(@"courier", @"");
     [self.view addSubview:appName];
     
     self.antennaImage = [[UIImageView alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - 70, 100, 50, 50)];
@@ -75,8 +77,8 @@
     
     //[self.view addSubview:self.gpsMessageView];
     
-    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2-50, 150,30)];
-    [ordersListButton setTitle:@"Заказы" forState:UIControlStateNormal];
+    UIButton *ordersListButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 80, [UIScreen mainScreen].bounds.size.height/2-50, 160,30)];
+    [ordersListButton setTitle:NSLocalizedString(@"orders", @"") forState:UIControlStateNormal];
     ordersListButton.backgroundColor = [UIColor whiteColor];
     [ordersListButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     ordersListButton.layer.borderWidth = 1;
@@ -89,8 +91,8 @@
     [ordersListButton setHidden:YES];
     [self.view addSubview: ordersListButton];
     
-    UIButton *aboutApplicationButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 75, [UIScreen mainScreen].bounds.size.height/2 + 50, 150,30)];
-    [aboutApplicationButton setTitle:@"О приложении" forState:UIControlStateNormal];
+    UIButton *aboutApplicationButton = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2 - 80, [UIScreen mainScreen].bounds.size.height/2 + 50, 160,30)];
+    [aboutApplicationButton setTitle:NSLocalizedString(@"aboutApp", @"") forState:UIControlStateNormal];
     aboutApplicationButton.backgroundColor = [UIColor whiteColor];
     [aboutApplicationButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     aboutApplicationButton.layer.borderWidth = 1;

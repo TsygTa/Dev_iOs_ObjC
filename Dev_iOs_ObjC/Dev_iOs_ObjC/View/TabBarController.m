@@ -23,13 +23,13 @@
     if(self) {
         MapViewController *mapViewController = [[MapViewController alloc]init];
         
-        mapViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Карта" image:[self prepareImage:[UIImage imageNamed:@"map_icon"]] tag:0];
+        mapViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"map", @"") image:[self prepareImage:[UIImage imageNamed:@"map_icon"]] tag:0];
         
         OrdersListViewController *ordersViewController = [[OrdersListViewController alloc]init];
-        ordersViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Список" image:[self prepareImage:[UIImage imageNamed:@"list_icon"]] tag:1];
+        ordersViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"list", @"") image:[self prepareImage:[UIImage imageNamed:@"list_icon"]] tag:1];
         
         DeliveriesListViewController *deliveriesViewController = [[DeliveriesListViewController alloc]init];
-        deliveriesViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Доставлено" image:[self prepareImage:[UIImage imageNamed:@"done_icon"]] tag:2];;
+        deliveriesViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"delivered", @"") image:[self prepareImage:[UIImage imageNamed:@"done_icon"]] tag:2];
         
         self.viewControllers = @[mapViewController,ordersViewController,deliveriesViewController];
         self.tabBar.tintColor = [UIColor blackColor];

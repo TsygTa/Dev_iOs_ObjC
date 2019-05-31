@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  Dev_iOs_ObjC
+
+  Created by Tatiana Tsygankova on 31/05/2019.
+  Copyright © 2019 Tatiana Tsygankova. All rights reserved.
+*/
+"courier" = "Courier";
+"orders" = "Orders";
+"aboutApp" = "About Application";
+"map" = "Map";
+"list" = "List";
+"delivered" = "Delivered";
+"order" = "Order";
+"total" = "Total";
+"address" = "Address";
+"phone" = "Phone";
+"name" = "Name";
+"number" = "#";
+"aboutAppFirstScreenText" = "Determine the addresses of orders, and your location on the map";
+"aboutAppSecondScreenText" = "View a list of new orders, mark the delivery of the order";
+"aboutAppThirdScreenText" = "View the list of delivered orders";

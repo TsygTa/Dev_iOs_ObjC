@@ -21,7 +21,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style: UITableViewStylePlain];
     [self.tableView setDataSource:self];
     [self.tableView setDelegate:self];
@@ -33,6 +32,7 @@
     
     self.deliveries = [[NSArray alloc] initWithArray:[[CoreDataService sharedInstance] deliveries]];
     [self.tableView reloadData];
+    self.tabBarController.navigationItem.title = NSLocalizedString(@"delivered", @"");
 }
 
 #pragma mark -- UITableViewDataSource

@@ -23,7 +23,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style: UITableViewStylePlain];
     [self.tableView setDataSource:self];
     [self.tableView setDelegate:self];
@@ -41,6 +40,7 @@
     self.orders = [[NSMutableArray alloc] initWithArray:[[CoreDataService sharedInstance] orders]];
     self.filteredArray = [self.orders copy];
     [self.tableView reloadData];
+    self.tabBarController.navigationItem.title = NSLocalizedString(@"orders", @"");
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {

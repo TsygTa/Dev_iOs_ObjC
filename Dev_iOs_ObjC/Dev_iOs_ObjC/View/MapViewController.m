@@ -63,6 +63,7 @@
     self.deliveries = [[CoreDataService sharedInstance] deliveries];
     [self centerMapOnOrder];
     [self showOrdersOnMap];
+    self.tabBarController.navigationItem.title = NSLocalizedString(@"courier", @"");
 }
 
 - (void) dealloc {
@@ -84,7 +85,7 @@
 - (void) showOrdersOnMap {
     for(Order *order in self.orders) {
         MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-        annotation.title = [[NSString alloc] initWithFormat:@"Заказ № %@", [[NSNumber alloc] initWithInt:order.number]];
+        annotation.title = [[NSString alloc] initWithFormat:@"%@ %@ %@", NSLocalizedString(@"order", @""), NSLocalizedString(@"number", @""), [[NSNumber alloc] initWithInt:order.number]];
         annotation.subtitle = [[NSString alloc] initWithFormat:@"%@\nСумма: %@\nТел: %@\nИмя: %@", order.address, [[NSNumber alloc] initWithInt: order.total], order.phone, order.name];
         annotation.coordinate = CLLocationCoordinate2DMake(order.latitude, order.longitude);
         
@@ -94,8 +95,8 @@
         MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
-        annotation.title = [[NSString alloc] initWithFormat:@"Доставлено № %@", [[NSNumber alloc] initWithInt: delivery.orderNumber]];
-        annotation.subtitle = [[NSString alloc] initWithFormat:@"Заказ №%@\nСумма: %@\nДоставлено: %@", [[NSNumber alloc] initWithInt: delivery.orderNumber], [[NSNumber alloc] initWithInt: delivery.orderTotal], [dateFormatter stringFromDate:[[NSDate alloc] initWithTimeIntervalSince1970:delivery.date]]];
+        annotation.title = [[NSString alloc] initWithFormat:@"%@ %@ %@", NSLocalizedString(@"delivered", @""), NSLocalizedString(@"number", @""), [[NSNumber alloc] initWithInt: delivery.orderNumber]];
+        annotation.subtitle = [[NSString alloc] initWithFormat:@"%@ %@%@\nСумма: %@\n%@: %@", NSLocalizedString(@"order", @""), NSLocalizedString(@"number", @""), [[NSNumber alloc] initWithInt: delivery.orderNumber], [[NSNumber alloc] initWithInt: delivery.orderTotal],NSLocalizedString(@"delivered", @""), [dateFormatter stringFromDate:[[NSDate alloc] initWithTimeIntervalSince1970:delivery.date]]];
         annotation.coordinate = CLLocationCoordinate2DMake(delivery.latitude, delivery.longitude);
         
         [self.mapView addAnnotation:annotation];
@@ -127,6 +128,7 @@
     CLLocationCoordinate2D center = [self.mapView region].center;
     CLLocationDistance latDelta = [self.mapView region].span.latitudeDelta * 2.0;
     CLLocationDistance lngDelta = [self.mapView region].span.longitudeDelta * 2.0;
+    if (latDelta >= 180 || lngDelta >= 180) return;
     MKCoordinateSpan span = MKCoordinateSpanMake(latDelta, lngDelta);
     MKCoordinateRegion region = MKCoordinateRegionMake(center, span);
     

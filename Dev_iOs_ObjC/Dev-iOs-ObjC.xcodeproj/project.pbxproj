@@ -10,6 +10,7 @@
 		3F215DF8229FB5F200746B89 /* ContentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F215DF7229FB5F200746B89 /* ContentViewController.m */; };
 		3F215DFB229FB66900746B89 /* PageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F215DFA229FB66900746B89 /* PageViewController.m */; };
 		3F215E00229FD60500746B89 /* ProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F215DFF229FD60500746B89 /* ProgressView.m */; };
+		3F72312A22A105F300130E1D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3F72312C22A105F300130E1D /* Localizable.strings */; };
 		3FC59DC0228B8F20003343D4 /* NetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DBF228B8F20003343D4 /* NetworkService.m */; };
 		3FC59DCB228C1AA2003343D4 /* OrdersListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DCA228C1AA2003343D4 /* OrdersListViewController.m */; };
 		3FC59DCE228C3FEF003343D4 /* OrdersListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC59DCD228C3FEF003343D4 /* OrdersListCell.m */; };
@@ -55,6 +56,9 @@
 		3F215DFA229FB66900746B89 /* PageViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PageViewController.m; sourceTree = "<group>"; };
 		3F215DFE229FD60500746B89 /* ProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressView.h; sourceTree = "<group>"; };
 		3F215DFF229FD60500746B89 /* ProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressView.m; sourceTree = "<group>"; };
+		3F72312722A07A1E00130E1D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		3F72312D22A1060300130E1D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		3F72312E22A1075B00130E1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3FA35882229DF0D40004DE90 /* Delivery+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Delivery+CoreDataProperties.h"; sourceTree = "<group>"; };
 		3FA35883229DF0D40004DE90 /* Delivery+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Delivery+CoreDataClass.h"; sourceTree = "<group>"; };
 		3FA35884229DF0D40004DE90 /* Delivery+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Delivery+CoreDataClass.m"; sourceTree = "<group>"; };
@@ -234,6 +238,7 @@
 				3FEA1BE2227F1EDE00133133 /* LaunchScreen.storyboard */,
 				3FEA1BE5227F1EDE00133133 /* Info.plist */,
 				3FEA1BE6227F1EDE00133133 /* main.m */,
+				3F72312C22A105F300130E1D /* Localizable.strings */,
 			);
 			path = Dev_iOs_ObjC;
 			sourceTree = "<group>";
@@ -361,13 +366,14 @@
 					};
 				};
 			};
-			buildConfigurationList = 3FEA1BCF227F1EDC00133133 /* Build configuration list for PBXProject "Dev_iOs_ObjC" */;
+			buildConfigurationList = 3FEA1BCF227F1EDC00133133 /* Build configuration list for PBXProject "Dev-iOs-ObjC" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 3FEA1BCB227F1EDC00133133;
 			productRefGroup = 3FEA1BD5227F1EDC00133133 /* Products */;
@@ -387,6 +393,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3FEA1BE4227F1EDE00133133 /* LaunchScreen.storyboard in Resources */,
+				3F72312A22A105F300130E1D /* Localizable.strings in Resources */,
 				3FEA1BE1227F1EDE00133133 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,10 +472,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		3F72312C22A105F300130E1D /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3F72312D22A1060300130E1D /* ru */,
+				3F72312E22A1075B00130E1D /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		3FEA1BE2227F1EDE00133133 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				3FEA1BE3227F1EDE00133133 /* Base */,
+				3F72312722A07A1E00130E1D /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -480,6 +497,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -539,6 +557,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -702,7 +721,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3FEA1BCF227F1EDC00133133 /* Build configuration list for PBXProject "Dev_iOs_ObjC" */ = {
+		3FEA1BCF227F1EDC00133133 /* Build configuration list for PBXProject "Dev-iOs-ObjC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3FEA1BFE227F1EDE00133133 /* Debug */,

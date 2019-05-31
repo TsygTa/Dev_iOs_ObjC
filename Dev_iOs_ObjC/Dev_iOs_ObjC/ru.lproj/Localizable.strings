@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  Dev_iOs_ObjC
+
+  Created by Tatiana Tsygankova on 31/05/2019.
+  Copyright © 2019 Tatiana Tsygankova. All rights reserved.
+*/
+"courier" = "Курьер";
+"orders" = "Заказы";
+"aboutApp" = "О приложении";
+"map" = "Карта";
+"list" = "Список";
+"delivered" = "Доставлено";
+"order" = "Заказ";
+"total" = "Сумма";
+"address" = "Адрес";
+"phone" = "Тел";
+"name" = "Имя";
+"number" = "№";
+"aboutAppFirstScreenText" = "Определяйте адреса заказов, и свое местоположение на карте";
+"aboutAppSecondScreenText" = "Просматривайте список новых заказов, отмечайте доставку заказа";
+"aboutAppThirdScreenText" = "Просматривайте список доставленных заказов";

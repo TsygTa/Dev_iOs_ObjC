@@ -51,8 +51,8 @@
 
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
-    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"Заказ №%@   Сумма: %@", [[NSNumber alloc] initWithInt:delivery.orderNumber], [[NSNumber alloc] initWithInt:delivery.orderTotal]]];
-    [self.dateLabel setText:[[NSString alloc] initWithFormat:@"Доставлено: %@", [dateFormatter stringFromDate: [[NSDate date] initWithTimeIntervalSince1970:delivery.date]]]];
+    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"%@ %@%@   %@: %@", NSLocalizedString(@"order", @""), NSLocalizedString(@"number", @""), [[NSNumber alloc] initWithInt:delivery.orderNumber], NSLocalizedString(@"total", @""), [[NSNumber alloc] initWithInt:delivery.orderTotal]]];
+    [self.dateLabel setText:[[NSString alloc] initWithFormat:@"%@: %@", NSLocalizedString(@"delivered", @""), [dateFormatter stringFromDate: [[NSDate date] initWithTimeIntervalSince1970:delivery.date]]]];
 }
 
 @end

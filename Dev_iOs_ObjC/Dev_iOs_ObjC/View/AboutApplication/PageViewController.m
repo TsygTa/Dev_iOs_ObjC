@@ -24,7 +24,7 @@
     self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
     if (self) {
         self.images = [[NSMutableArray alloc] initWithObjects:[UIImage imageNamed:@"orders_map"], [UIImage imageNamed:@"orders_list"], [UIImage imageNamed:@"deliveries_list"], nil];
-        self.texts = [[NSMutableArray alloc] initWithObjects:@"Определяйте адреса заказов, и свое местоположение на карте", @"Просматривайте список новых заказов, отмечайте доставку заказа", @"Просматривайте список доставленных заказов", nil];
+        self.texts = [[NSMutableArray alloc] initWithObjects:NSLocalizedString(@"aboutAppFirstScreenText", @""), NSLocalizedString(@"aboutAppSecondScreenText", @""), NSLocalizedString(@"aboutAppThirdScreenText", @""), nil];
         
         self.dataSource = self;
         self.delegate = self;

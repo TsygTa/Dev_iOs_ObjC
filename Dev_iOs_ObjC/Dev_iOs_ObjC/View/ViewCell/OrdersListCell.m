@@ -36,7 +36,7 @@
         [self.contentView addSubview:self.phoneAndName];
         
         self.deliveredButton = [[UIButton alloc] initWithFrame:self.bounds];
-        [self.deliveredButton setTitle:@"Доставлено" forState:UIControlStateNormal];
+        [self.deliveredButton setTitle:NSLocalizedString(@"delivered", @"") forState:UIControlStateNormal];
         self.deliveredButton.backgroundColor = [UIColor greenColor];
         [self.deliveredButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [self.deliveredButton addTarget: self action:@selector(deliveredButtonDidTap) forControlEvents:UIControlEventTouchUpInside];
@@ -76,9 +76,9 @@
 - (void) config:(Order *)order {
     self.order = order;
     
-    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"№ %@   Сумма: %@", [[NSNumber alloc] initWithInt:order.number], [[NSNumber alloc] initWithInt:order.total]]];
-    [self.address setText:[[NSString alloc] initWithFormat:@"Адрес: %@",order.address]];
-    [self.phoneAndName setText:[[NSString alloc] initWithFormat:@"Тел: %@   Имя: %@",order.phone, order.name]];
+    [self.numberAndTotal setText:[[NSString alloc] initWithFormat:@"%@ %@   %@: %@", NSLocalizedString(@"number", @""), [[NSNumber alloc] initWithInt:order.number], NSLocalizedString(@"total", @""), [[NSNumber alloc] initWithInt:order.total]]];
+    [self.address setText:[[NSString alloc] initWithFormat:@"%@: %@",NSLocalizedString(@"address", @""), order.address]];
+    [self.phoneAndName setText:[[NSString alloc] initWithFormat:@"%@: %@   %@: %@", NSLocalizedString(@"phone", @""),order.phone, NSLocalizedString(@"name", @""), order.name]];
     [self.deliveredButton setHidden:YES];
 }
 
